@@ -1,0 +1,62 @@
+defaultTasks 'clean','test','aggregate'
+
+group 'jokes-parade'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "net.serenity-bdd:serenity-gradle-plugin:2.0.70"
+        classpath "gradle.plugin.com.github.sherter.google-java-format:google-java-format-gradle-plugin:0.8"
+    }
+}
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'net.serenity-bdd.aggregator'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+ext {
+
+    serenityCoreVersion = '2.4.34'
+    serenityCucumberVersion = '2.4.34'
+    junitVersion = '4.13.1'
+}
+
+dependencies {
+
+    implementation "net.serenity-bdd:serenity-core:$rootProject.ext.serenityCoreVersion"
+
+    // this dependency is for loading the class CucumberWithSerenity in the @RunWith tag
+    implementation "net.serenity-bdd:serenity-cucumber6:$rootProject.ext.serenityCucumberVersion"
+
+    implementation "net.serenity-bdd:serenity-screenplay:$rootProject.ext.serenityCoreVersion"
+
+    // this dependency is to import io.restassured.RestAssured;
+    implementation "net.serenity-bdd:serenity-screenplay-rest:$rootProject.ext.serenityCoreVersion"
+
+    // this dependency is for CucumberOptions, Snippets
+    testImplementation group: 'io.cucumber', name: 'cucumber-junit', version: '6.9.0'
+
+    // this dependency is for  GivenWhenThen hooks
+    implementation group: 'io.cucumber', name: 'cucumber-java', version: '4.2.0'
+
+    testImplementation "junit:junit:$rootProject.ext.junitVersion"
+
+    // this dependency is to print logs in console
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.31'
+
+}
+
+tasks.withType(Test) {
+    test.finalizedBy(aggregate)
+}
